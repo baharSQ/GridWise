@@ -11,6 +11,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   CurrentUser,
@@ -23,12 +29,25 @@ import { ScheduleResponseDto } from './dto/schedule-response.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { SchedulesService } from './schedules.service';
 
+@ApiTags('Schedules')
+@ApiBearerAuth('access-token')
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class SchedulesController {
   constructor(private readonly schedulesService: SchedulesService) {}
 
   @Post('households/:id/schedules')
+  @ApiOperation({ summary: 'Create a schedule for a device in a household' })
+  @ApiResponse({ status: 201, type: ScheduleResponseDto })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error or startTime >= endTime',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden — household belongs to another user',
+  })
   create(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) householdId: string,
@@ -42,6 +61,13 @@ export class SchedulesController {
   }
 
   @Get('households/:id/schedules')
+  @ApiOperation({ summary: 'List all schedules for a household' })
+  @ApiResponse({ status: 200, type: [ScheduleResponseDto] })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden — household belongs to another user',
+  })
   findAll(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) householdId: string,
@@ -50,6 +76,11 @@ export class SchedulesController {
   }
 
   @Get('schedules/:id')
+  @ApiOperation({ summary: 'Get a schedule by ID' })
+  @ApiResponse({ status: 200, type: ScheduleResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Schedule not found' })
   findOne(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) scheduleId: string,
@@ -58,6 +89,11 @@ export class SchedulesController {
   }
 
   @Patch('schedules/:id')
+  @ApiOperation({ summary: 'Update a schedule' })
+  @ApiResponse({ status: 200, type: ScheduleResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Schedule not found' })
   update(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) scheduleId: string,
@@ -68,6 +104,10 @@ export class SchedulesController {
 
   @Delete('schedules/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a schedule' })
+  @ApiResponse({ status: 204, description: 'Schedule deleted' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async delete(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) scheduleId: string,
@@ -76,6 +116,17 @@ export class SchedulesController {
   }
 
   @Post('households/:id/schedules/optimize')
+  @ApiOperation({
+    summary: 'Optimize schedules against a power limit',
+    description:
+      'Detects time segments where total device power exceeds the given limit. Returns feasibility and a recommended order (flexible devices first).',
+  })
+  @ApiResponse({ status: 201, type: OptimizeSchedulesResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden — household belongs to another user',
+  })
   optimize(
     @CurrentUser() user: RequestUser,
     @Param('id', new ParseUUIDPipe()) householdId: string,

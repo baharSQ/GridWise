@@ -9,6 +9,7 @@ if (!globalThis.crypto) {
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 
@@ -23,6 +24,22 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('GridWise API')
+    .setDescription(
+      'Household energy management API — manage households, devices, and energy schedules with power-limit optimization.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);
