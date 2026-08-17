@@ -6,6 +6,7 @@ import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HouseholdsModule } from './modules/households/households.module';
 import { DevicesModule } from './modules/devices/devices.module';
+import { SchedulesModule } from './modules/schedules/schedules.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DevicesModule } from './modules/devices/devices.module';
     AuthModule,
     HouseholdsModule,
     DevicesModule,
+    SchedulesModule,
     HealthModule,
   ],
 })
