@@ -1,0 +1,5 @@
+export enum DeviceType {
+  EV_CHARGER = 'EV_CHARGER',
+  WASHING_MACHINE = 'WASHING_MACHINE',
+  DISHWASHER = 'DISHWASHER',
+}
