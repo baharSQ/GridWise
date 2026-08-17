@@ -94,7 +94,9 @@ describe('Schedules (e2e)', () => {
     return { user, accessToken: loginResult.accessToken };
   }
 
-  async function createHousehold(accessToken: string): Promise<HouseholdResponse> {
+  async function createHousehold(
+    accessToken: string,
+  ): Promise<HouseholdResponse> {
     const response = await request(app.getHttpServer())
       .post('/api/households')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -210,7 +212,10 @@ describe('Schedules (e2e)', () => {
     const intruder = await registerAndLogin();
 
     const ownerHousehold = await createHousehold(owner.accessToken);
-    const ownerDevice = await createDevice(owner.accessToken, ownerHousehold.id);
+    const ownerDevice = await createDevice(
+      owner.accessToken,
+      ownerHousehold.id,
+    );
     const intruderHousehold = await createHousehold(intruder.accessToken);
 
     await request(app.getHttpServer())
@@ -229,14 +234,24 @@ describe('Schedules (e2e)', () => {
     const { accessToken } = await registerAndLogin();
     const household = await createHousehold(accessToken);
     const device = await createDevice(accessToken, household.id);
-    const scheduleA = await createSchedule(accessToken, household.id, device.id, {
-      startTime: '2026-08-18T06:00:00.000Z',
-      endTime: '2026-08-18T07:00:00.000Z',
-    });
-    const scheduleB = await createSchedule(accessToken, household.id, device.id, {
-      startTime: '2026-08-18T07:00:00.000Z',
-      endTime: '2026-08-18T08:00:00.000Z',
-    });
+    const scheduleA = await createSchedule(
+      accessToken,
+      household.id,
+      device.id,
+      {
+        startTime: '2026-08-18T06:00:00.000Z',
+        endTime: '2026-08-18T07:00:00.000Z',
+      },
+    );
+    const scheduleB = await createSchedule(
+      accessToken,
+      household.id,
+      device.id,
+      {
+        startTime: '2026-08-18T07:00:00.000Z',
+        endTime: '2026-08-18T08:00:00.000Z',
+      },
+    );
 
     const listResponse = await request(app.getHttpServer())
       .get(`/api/households/${household.id}/schedules`)
@@ -254,7 +269,11 @@ describe('Schedules (e2e)', () => {
     const intruder = await registerAndLogin();
     const household = await createHousehold(owner.accessToken);
     const device = await createDevice(owner.accessToken, household.id);
-    const schedule = await createSchedule(owner.accessToken, household.id, device.id);
+    const schedule = await createSchedule(
+      owner.accessToken,
+      household.id,
+      device.id,
+    );
 
     await request(app.getHttpServer())
       .get(`/api/schedules/${schedule.id}`)
@@ -318,7 +337,9 @@ describe('Schedules (e2e)', () => {
   it('schedules within power limit are feasible', async () => {
     const { accessToken } = await registerAndLogin();
     const household = await createHousehold(accessToken);
-    const deviceA = await createDevice(accessToken, household.id, { isFlexible: true });
+    const deviceA = await createDevice(accessToken, household.id, {
+      isFlexible: true,
+    });
     const deviceB = await createDevice(accessToken, household.id, {
       name: 'Fixed2',
       isFlexible: false,
@@ -349,8 +370,12 @@ describe('Schedules (e2e)', () => {
   it('schedules exceeding power limit are detected', async () => {
     const { accessToken } = await registerAndLogin();
     const household = await createHousehold(accessToken);
-    const deviceA = await createDevice(accessToken, household.id, { isFlexible: true });
-    const deviceB = await createDevice(accessToken, household.id, { isFlexible: false });
+    const deviceA = await createDevice(accessToken, household.id, {
+      isFlexible: true,
+    });
+    const deviceB = await createDevice(accessToken, household.id, {
+      isFlexible: false,
+    });
     await createSchedule(accessToken, household.id, deviceA.id, {
       targetPowerKw: 4,
     });
@@ -383,11 +408,16 @@ describe('Schedules (e2e)', () => {
       name: 'Fixed',
       isFlexible: false,
     });
-    const flexibleSchedule = await createSchedule(accessToken, household.id, flexibleDevice.id, {
-      startTime: '2026-08-18T08:00:00.000Z',
-      endTime: '2026-08-18T10:00:00.000Z',
-      targetPowerKw: 4,
-    });
+    const flexibleSchedule = await createSchedule(
+      accessToken,
+      household.id,
+      flexibleDevice.id,
+      {
+        startTime: '2026-08-18T08:00:00.000Z',
+        endTime: '2026-08-18T10:00:00.000Z',
+        targetPowerKw: 4,
+      },
+    );
     await createSchedule(accessToken, household.id, fixedDevice.id, {
       startTime: '2026-08-18T08:00:00.000Z',
       endTime: '2026-08-18T10:00:00.000Z',

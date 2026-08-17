@@ -98,7 +98,10 @@ export class DevicesService {
     }
   }
 
-  private async findOwnedDevice(userId: string, deviceId: string): Promise<Device> {
+  private async findOwnedDevice(
+    userId: string,
+    deviceId: string,
+  ): Promise<Device> {
     const device = await this.deviceRepository.findOne({
       where: { id: deviceId },
     });

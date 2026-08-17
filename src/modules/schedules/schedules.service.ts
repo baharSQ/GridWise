@@ -69,7 +69,10 @@ export class SchedulesService {
     return schedules.map((schedule) => this.toResponse(schedule));
   }
 
-  async findOneForUser(userId: string, scheduleId: string): Promise<ScheduleResponseDto> {
+  async findOneForUser(
+    userId: string,
+    scheduleId: string,
+  ): Promise<ScheduleResponseDto> {
     const schedule = await this.findScheduleOrThrow(scheduleId);
     await this.assertOwnedHousehold(userId, schedule.householdId);
     return this.toResponse(schedule);
@@ -131,7 +134,11 @@ export class SchedulesService {
     });
     const devicesById = new Map(devices.map((device) => [device.id, device]));
 
-    return this.optimizationService.optimize(schedules, devicesById, dto.maxPowerKw);
+    return this.optimizationService.optimize(
+      schedules,
+      devicesById,
+      dto.maxPowerKw,
+    );
   }
 
   private async assertOwnedHousehold(
@@ -173,7 +180,9 @@ export class SchedulesService {
     }
 
     await this.assertOwnedHousehold(userId, device.householdId);
-    throw new BadRequestException('Device does not belong to the selected household.');
+    throw new BadRequestException(
+      'Device does not belong to the selected household.',
+    );
   }
 
   private async findScheduleOrThrow(scheduleId: string): Promise<Schedule> {

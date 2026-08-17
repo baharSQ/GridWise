@@ -141,7 +141,11 @@ describe('Devices (e2e)', () => {
 
   it('authenticated user can create a device', async () => {
     const { accessToken } = await registerAndLogin();
-    const household = await createHousehold(accessToken, 'Home', 'Europe/Berlin');
+    const household = await createHousehold(
+      accessToken,
+      'Home',
+      'Europe/Berlin',
+    );
 
     const device = await createDevice(accessToken, household.id);
 
@@ -154,7 +158,11 @@ describe('Devices (e2e)', () => {
 
   it('unauthenticated request returns 401', async () => {
     const { accessToken } = await registerAndLogin();
-    const household = await createHousehold(accessToken, 'Home', 'Europe/Berlin');
+    const household = await createHousehold(
+      accessToken,
+      'Home',
+      'Europe/Berlin',
+    );
 
     await request(app.getHttpServer())
       .post(`/api/households/${household.id}/devices`)
@@ -168,7 +176,11 @@ describe('Devices (e2e)', () => {
 
   it('user can list devices from their household', async () => {
     const { accessToken } = await registerAndLogin();
-    const household = await createHousehold(accessToken, 'List Home', 'Europe/Paris');
+    const household = await createHousehold(
+      accessToken,
+      'List Home',
+      'Europe/Paris',
+    );
     const deviceA = await createDevice(accessToken, household.id, {
       name: 'Washer',
       deviceType: 'WASHING_MACHINE',
@@ -191,7 +203,9 @@ describe('Devices (e2e)', () => {
 
     expect(deviceIds).toContain(deviceA.id);
     expect(deviceIds).toContain(deviceB.id);
-    expect(devices.every((device) => device.householdId === household.id)).toBe(true);
+    expect(devices.every((device) => device.householdId === household.id)).toBe(
+      true,
+    );
   });
 
   it("user cannot access another user's household devices", async () => {
@@ -268,7 +282,11 @@ describe('Devices (e2e)', () => {
 
   it('updates a device successfully', async () => {
     const { accessToken } = await registerAndLogin();
-    const household = await createHousehold(accessToken, 'Update OK', 'Europe/Berlin');
+    const household = await createHousehold(
+      accessToken,
+      'Update OK',
+      'Europe/Berlin',
+    );
     const device = await createDevice(accessToken, household.id, {
       deviceType: 'DISHWASHER',
       nominalPowerKw: 2.2,
@@ -295,7 +313,11 @@ describe('Devices (e2e)', () => {
 
   it('deletes a device successfully', async () => {
     const { accessToken } = await registerAndLogin();
-    const household = await createHousehold(accessToken, 'Delete OK', 'Europe/Berlin');
+    const household = await createHousehold(
+      accessToken,
+      'Delete OK',
+      'Europe/Berlin',
+    );
     const device = await createDevice(accessToken, household.id);
 
     await request(app.getHttpServer())

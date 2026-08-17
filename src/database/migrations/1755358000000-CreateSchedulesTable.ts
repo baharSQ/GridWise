@@ -105,7 +105,10 @@ export class CreateSchedulesTable1755358000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropIndex('schedules', 'IX_schedules_householdId_startTime');
+    await queryRunner.dropIndex(
+      'schedules',
+      'IX_schedules_householdId_startTime',
+    );
     await queryRunner.dropIndex('schedules', 'IX_schedules_deviceId');
     await queryRunner.dropIndex('schedules', 'IX_schedules_householdId');
     await queryRunner.dropTable('schedules');

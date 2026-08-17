@@ -13,7 +13,10 @@ import { LoginDto } from './dto/login.dto';
 import { AuthUserDto } from './dto/auth-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { CurrentUser, type RequestUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type RequestUser,
+} from '../../common/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {

@@ -1,12 +1,31 @@
 import { webcrypto } from 'node:crypto';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import request from 'supertest';
+import request, { type Response } from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
 if (!globalThis.crypto) {
   Object.defineProperty(globalThis, 'crypto', { value: webcrypto });
+}
+
+type RegisteredUserResponse = {
+  id: string;
+  email: string;
+  createdAt: string;
+};
+
+type LoginResponse = {
+  accessToken: string;
+};
+
+type ApiError = {
+  message: string | string[];
+  statusCode: number;
+};
+
+function bodyAs<T>(response: Response): T {
+  return response.body as T;
 }
 
 describe('Auth (e2e)', () => {
@@ -46,11 +65,14 @@ describe('Auth (e2e)', () => {
         password: 'StrongPass123!',
       })
       .expect(201);
+    const registeredUser = bodyAs<RegisteredUserResponse>(response);
 
-    expect(response.body.id).toBeDefined();
-    expect(response.body.email).toBe(email.toLowerCase());
-    expect(response.body.password).toBeUndefined();
-    expect(response.body.passwordHash).toBeUndefined();
+    expect(registeredUser.id).toBeDefined();
+    expect(registeredUser.email).toBe(email.toLowerCase());
+    expect((response.body as Record<string, unknown>).password).toBeUndefined();
+    expect(
+      (response.body as Record<string, unknown>).passwordHash,
+    ).toBeUndefined();
   });
 
   it('rejects duplicate registration', async () => {
@@ -69,8 +91,9 @@ describe('Auth (e2e)', () => {
       .post('/api/auth/register')
       .send(payload)
       .expect(409);
+    const error = bodyAs<ApiError>(duplicateResponse);
 
-    expect(duplicateResponse.body.message).toContain('already registered');
+    expect(error.message).toContain('already registered');
   });
 
   it('logs in successfully', async () => {
@@ -86,8 +109,9 @@ describe('Auth (e2e)', () => {
       .post('/api/auth/login')
       .send({ email, password })
       .expect(200);
+    const loginResult = bodyAs<LoginResponse>(loginResponse);
 
-    expect(loginResponse.body.accessToken).toBeDefined();
+    expect(loginResult.accessToken).toBeDefined();
   });
 
   it('rejects invalid credentials', async () => {
@@ -122,13 +146,17 @@ describe('Auth (e2e)', () => {
       .post('/api/auth/login')
       .send({ email, password })
       .expect(200);
+    const loginResult = bodyAs<LoginResponse>(loginResponse);
 
     const meResponse = await request(app.getHttpServer())
       .get('/api/auth/me')
-      .set('Authorization', `Bearer ${loginResponse.body.accessToken}`)
+      .set('Authorization', `Bearer ${loginResult.accessToken}`)
       .expect(200);
+    const me = bodyAs<RegisteredUserResponse>(meResponse);
 
-    expect(meResponse.body.email).toBe(email.toLowerCase());
-    expect(meResponse.body.passwordHash).toBeUndefined();
+    expect(me.email).toBe(email.toLowerCase());
+    expect(
+      (meResponse.body as Record<string, unknown>).passwordHash,
+    ).toBeUndefined();
   });
 });

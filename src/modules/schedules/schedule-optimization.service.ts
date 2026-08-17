@@ -147,12 +147,12 @@ export class ScheduleOptimizationService {
         nextRecommendedStart = recommendedEnd;
       }
 
-      const recommendation: RecommendedScheduleDto['recommendation'] =
-        !entry.device.isFlexible
-          ? 'KEEP'
-          : recommendedStart === originalStart
-            ? 'MOVE_IF_NEEDED'
-            : 'DELAY';
+      const recommendation: RecommendedScheduleDto['recommendation'] = !entry
+        .device.isFlexible
+        ? 'KEEP'
+        : recommendedStart === originalStart
+          ? 'MOVE_IF_NEEDED'
+          : 'DELAY';
 
       return {
         scheduleId: entry.schedule.id,

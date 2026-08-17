@@ -34,7 +34,11 @@ export class SchedulesController {
     @Param('id', new ParseUUIDPipe()) householdId: string,
     @Body() dto: CreateScheduleDto,
   ): Promise<ScheduleResponseDto> {
-    return this.schedulesService.createInHousehold(user.userId, householdId, dto);
+    return this.schedulesService.createInHousehold(
+      user.userId,
+      householdId,
+      dto,
+    );
   }
 
   @Get('households/:id/schedules')
@@ -77,6 +81,10 @@ export class SchedulesController {
     @Param('id', new ParseUUIDPipe()) householdId: string,
     @Body() dto: OptimizeSchedulesDto,
   ): Promise<OptimizeSchedulesResponseDto> {
-    return this.schedulesService.optimizeForHousehold(user.userId, householdId, dto);
+    return this.schedulesService.optimizeForHousehold(
+      user.userId,
+      householdId,
+      dto,
+    );
   }
 }
