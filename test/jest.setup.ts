@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { webcrypto } from 'node:crypto';
 
 if (!globalThis.crypto) {
